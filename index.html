@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<title>غيّر جوك TV | البث المباشر الرسمي</title>
+<link rel="icon" type="image/png" sizes="32x32" href="cover.jpg">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#07070f; --panel:#0e0e1c; --accent:#ff2a3b; --border:rgba(255,255,255,0.08); --text:#d0d0e8; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased}
+.header{background:var(--panel);border-bottom:1px solid var(--border);padding:0 20px;display:flex;justify-content:space-between;align-items:center;height:56px;flex-shrink:0}
+.logo{font-size:1.25rem;font-weight:900;color:#fff}
+.logo span{color:var(--accent)}
+.header-badges{display:flex;align-items:center;gap:12px}
+.live-badge{background:rgba(255,42,59,0.15);border:1px solid var(--accent);color:var(--accent);padding:5px 14px;border-radius:50px;font-size:0.8rem;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 0 10px rgba(255,42,59,0.2)}
+.viewer-badge{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:#fff;padding:5px 14px;border-radius:50px;font-size:0.8rem;font-weight:700;display:flex;align-items:center;gap:6px;min-width:55px;justify-content:center}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.main-layout{flex:1;display:flex;overflow:hidden;background:#000}
+.player-container{flex:3;display:flex;align-items:center;justify-content:center;background:#000;position:relative}
+.screen-wrapper{width:100%;aspect-ratio:16/9;max-height:100%;background:#000;position:relative;overflow:hidden}
+#ytPlayer{width:100%;height:100%;border:none}
+.click-blocker{position:absolute;inset:0;z-index:5;background:transparent}
+.unmute-floating-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(45deg,#ff2a3b,#d10010);color:#fff;border:none;padding:16px 32px;border-radius:50px;font-weight:900;font-size:1.1rem;box-shadow:0 10px 30px rgba(255,42,59,0.6);z-index:99;cursor:pointer;display:flex;align-items:center;gap:10px;animation:pulseButton 1.8s infinite}
+@keyframes pulseButton{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.05)}100%{transform:translate(-50%,-50%) scale(1)}}
+
+.tv-watermark {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    z-index: 20;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.75);
+    text-shadow: 0 0 10px rgba(255, 42, 59, 0.5), 0 0 5px rgba(0,0,0,0.9);
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transform-style: preserve-3d;
+    animation: tvFlip 8s ease-in-out infinite; 
+}
+.tv-watermark span { color: rgba(255, 42, 59, 0.85); }
+
+@keyframes tvFlip {
+    0%, 70% { transform: perspective(600px) rotateY(0deg); }
+    85% { transform: perspective(600px) rotateY(180deg); }
+    100% { transform: perspective(600px) rotateY(360deg); }
+}
+
+/* ═══ ستايل الشريط الكلاسيكي المستقر ═══ */
+.embedded-ticker{position:absolute;bottom:0;left:0;right:0;height:42px;background:rgba(14,14,28,0.9);border-top:1px solid var(--border);backdrop-filter:blur(10px);display:flex;align-items:center;z-index:10;overflow:hidden}
+.ticker-tag{background:var(--accent);height:100%;padding:0 18px;display:flex;align-items:center;color:#fff;font-weight:900;font-size:0.9rem;z-index:12;white-space:nowrap;box-shadow:-5px 0 15px rgba(0,0,0,0.5);gap:6px}
+.ticker-space {
+    flex: 1;
+    height: 100%;
+    line-height: 42px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    direction: ltr;
+    text-align: right;
+}
+
+.youtube-chat-panel{flex:1;min-width:360px;max-width:420px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;box-shadow:inset 5px 0 20px rgba(0,0,0,0.3)}
+.chat-title{padding:16px;border-bottom:1px solid var(--border);font-weight:900;font-size:0.95rem;flex-shrink:0;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02)}
+
+.chat-body{flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;background:#07070f;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+.chat-body::-webkit-scrollbar{width:3px}
+.chat-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:10px}
+
+.yt-message{font-size:0.92rem;line-height:1.5;background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;border-right:3px solid rgba(255,255,255,0.06);word-wrap:break-word}
+.yt-author{font-weight:900;color:#a9a9c5;margin-left:6px;display:inline}
+.yt-text{color:#fff;display:inline;font-weight:500}
+.yt-message.new-msg{animation:softSlide 0.2s ease-out forwards}
+@keyframes softSlide{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+
+/* ستايل اسم صوفي المالك */
+.owner-name{font-weight:900;background:linear-gradient(135deg,#ffd740,#ff6d00,#ff2a3b,#d500f9);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:ownerFlow 3s ease infinite;display:inline-flex;align-items:center;gap:5px}
+.owner-name i{-webkit-text-fill-color:#ffd740;font-size:0.85rem}
+.owner-colon{color:#ffd740;font-weight:bold;margin:0 2px}
+.yt-message.owner-msg{border-right:3px solid #ffd740!important;background:linear-gradient(90deg,rgba(255,215,64,0.05),transparent)!important}
+@keyframes ownerFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* ═══ ستايل البوت الجديد ═══ */
+.bot-name {font-weight:900;background:linear-gradient(135deg,#00f2fe,#4facfe,#0000ff);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-flex;align-items:center;gap:5px;animation:ownerFlow 2s ease infinite;}
+.bot-name i {-webkit-text-fill-color:#00f2fe;font-size:0.85rem}
+.bot-colon {color:#00f2fe;font-weight:bold;margin:0 2px}
+.yt-message.bot-msg {border-right:3px solid #00f2fe!important;background:linear-gradient(90deg,rgba(0,242,254,0.05),transparent)!important}
+
+.admin-bar{display:none;padding:10px 16px;background:linear-gradient(90deg,rgba(255,42,59,0.1),rgba(255,215,64,0.05));border-bottom:1px solid rgba(255,215,64,0.2);justify-content:space-between;align-items:center;flex-shrink:0}
+.admin-bar span{color:#ffd740;font-size:0.85rem;font-weight:900;display:flex;align-items:center;gap:6px}
+.admin-clear-btn{background:rgba(255,42,59,0.2);color:#ff4757;border:1px solid #ff4757;padding:6px 12px;border-radius:6px;font-size:0.75rem;font-weight:900;cursor:pointer}
+.mod-actions{float:left;display:flex;gap:6px;margin-top:2px}
+.mod-btn{font-size:0.7rem;font-weight:900;padding:3px 8px;border-radius:5px;cursor:pointer}
+.mod-btn.mute{background:rgba(255,171,0,0.15);color:#ffab00}
+.mod-btn.ban{background:rgba(255,42,59,0.15);color:#ff2a3b}
+.mod-btn.unban{background:rgba(0,200,83,0.15);color:#00c853}
+
+.chat-inputs{padding:14px 16px;border-top:1px solid var(--border);background:var(--panel);flex-shrink:0}
+.input-style{width:100%;padding:12px 14px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:16px;font-weight:700;font-family:inherit;margin-bottom:10px;box-shadow:inset 0 2px 5px rgba(0,0,0,0.5)}
+.input-style:focus{outline:none;border-color:rgba(255,215,64,0.6)}
+.input-style::placeholder{color:#6a6a8c;font-weight:500}
+.send-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.send-btn{background:var(--accent);color:#fff;border:none;height:46px;width:55px;border-radius:10px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#secretCodeSection{display:none;margin-bottom:10px}
+#secretCodeSection .input-style{border-color:#ffd740}
+
+.toast-msg{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:rgba(14,14,28,0.95);color:#fff;padding:12px 24px;border-radius:50px;border:1px solid var(--border);font-weight:900;font-size:0.9rem;z-index:9999;display:flex;align-items:center;gap:8px;transition:top 0.4s cubic-bezier(0.175,0.885,0.32,1.275);pointer-events:none}
+.toast-msg.show{top:30px}
+.toast-msg.success i{color:#00c853}
+.toast-msg.danger i{color:#ff2a3b}
+
+@media(max-width:900px){
+    body{height:100dvh;overflow:hidden}
+    .main-layout{flex-direction:column}
+    .player-container{flex:none;width:100%}
+    .youtube-chat-panel{max-width:100%;min-width:100%;flex:1;border-right:none;border-top:1px solid var(--border)}
+    .tv-watermark { font-size: 1.1rem; top: 15px; right: 15px; }
+}
+</style>
+</head>
+<body>
+
+<div id="smartToast" class="toast-msg"><i class="fa-solid fa-circle-check"></i> <span id="toastText"></span></div>
+
+<header class="header">
+  <div class="logo">غيّر جوك <span>TV</span></div>
+  <div class="header-badges">
+    <div class="viewer-badge"><i class="fa-solid fa-eye" style="color:var(--accent)"></i> <span id="viewerCount">0</span></div>
+    <div class="live-badge"><i class="fa-solid fa-circle" style="font-size:8px;animation:blink 1.2s infinite;color:#fff"></i> مباشر</div>
+  </div>
+</header>
+
+<div class="main-layout">
+  <div class="player-container">
+    <div class="screen-wrapper">
+      <div class="tv-watermark"><i class="fa-solid fa-tv"></i> غيّر جوك <span>TV</span></div>
+      <button class="unmute-floating-btn" id="unmuteBtn" onclick="enableSound()"><i class="fa-solid fa-play"></i> انقر لتشغيل البث والصوت 🔊</button>
+      <div class="click-blocker"></div>
+      <div id="ytPlayer"></div>
+      
+      <div class="embedded-ticker">
+        <div class="ticker-tag"><i class="fa-solid fa-bullhorn"></i> قناه TV</div>
+        <marquee class="ticker-space" direction="right" scrollamount="5" id="tickerText">
+          شـاشـة غيّر جوك TV ترحب بكم في البث المباشر الحصري _ إدارة القناة: صوفي ال دليم _ لمتابعتنا والتواصل معنا عبر انستغرام: 6.2nr _ نتمنى لكم قضاء أوقات ممتعة ومليئة بالفرح والطاقة الإيجابية 24/7 
+        </marquee>
+      </div>
+    </div>
+  </div>
+
+  <div class="youtube-chat-panel">
+    <div class="chat-title"><i class="fa-regular fa-comments" style="color:var(--accent);font-size:1.1rem"></i> المحادثة المباشرة</div>
+    <div class="admin-bar" id="adminPanel"><span><i class="fa-solid fa-crown" style="font-size:1.1rem"></i> المالك: صوفي ال دليم</span><button class="admin-clear-btn" onclick="clearAllChatGlobal()"><i class="fa-solid fa-trash-can"></i> مسح الدردشة</button></div>
+    <div class="chat-body" id="chatBox"></div>
+    <div class="chat-inputs">
+      <input type="text" id="chatUser" class="input-style" placeholder="اسمك المستعار">
+      <div id="secretCodeSection"><div style="font-size:0.75rem;color:#ffd740;margin-bottom:6px;font-weight:700"><i class="fa-solid fa-key"></i> اكتب كودك السري (أول مرة فقط)</div><input type="password" id="adminCode" class="input-style" placeholder="أدخل الكود السري..." /></div>
+      <div class="send-row"><input type="text" id="chatMsg" class="input-style" style="margin-bottom:0;flex:1" placeholder="اكتب رسالتك هنا..."><button class="send-btn" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const SB_URL='https://hvgtysuwzdtsgqjgsuhi.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2Z3R5c3V3emR0c2dxamdzdWhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjgyNDIsImV4cCI6MjA5NjE0NDI0Mn0.YjlcTIO_uycIolB3N2dkw0U76iJ76G57uhwpuTavrSM';
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const sessionId=Math.random().toString(36).substring(2)+'_'+Date.now().toString(36);
+let player,currentVideoId='',isUnmuted=false,currentVolume=100,localIndexOffset=0,lastSlot=-1,watchdogTimer=null;
+
+const SONG_DURATION_MS=4*60*1000; 
+window.isAdminMode=false;
+let lastKnownViewerCount=0,lastMsgCount=0, processedMsgIds = new Set();
+
+function handleVideoFailure(){ localIndexOffset++; controlCenterLoop(); }
+function onYouTubeIframeAPIReady(){ player=new YT.Player('ytPlayer',{playerVars:{autoplay:1,controls:0,rel:0,loop:1,modestbranding:1,disablekb:1,enablejsapi:1,playsinline:1,origin:window.location.origin},events:{onReady:()=>{if(player.mute)player.mute();controlCenterLoop()},onStateChange:onPlayerStateChange,onError:()=>handleVideoFailure()}}) }
+function onPlayerStateChange(e){ if(e.data===YT.PlayerState.PLAYING)clearTimeout(watchdogTimer); if(e.data===-1){setTimeout(()=>{if(player.getPlayerState()===-1)handleVideoFailure()},3000)} }
+function enableSound(){if(player){isUnmuted=true;if(player.unMute)player.unMute();if(player.setVolume)player.setVolume(currentVolume);if(player.playVideo)player.playVideo();document.getElementById('unmuteBtn').style.display='none'}}
+
+function checkSavedOwner(){if(localStorage.getItem('owner_verified')==='true'){window.isAdminMode=true;document.getElementById('adminPanel').style.display='flex';document.getElementById('secretCodeSection').style.display='none';const cu=document.getElementById('chatUser');cu.value='صوفي ال دليم';cu.disabled=true;cu.style.background='rgba(255,215,64,0.08)';cu.style.border='1px solid #ffd740';cu.style.color='#ffd740';}}
+function showToast(msg,isDanger=false){const t=document.getElementById('smartToast');document.getElementById('toastText').textContent=msg;t.className='toast-msg show '+(isDanger?'danger':'success');setTimeout(()=>t.classList.remove('show'),2500)}
+async function pingViewer(){try{await sb.from('viewers').upsert({session_id:sessionId,last_seen:new Date().toISOString()},{onConflict:'session_id'})}catch(e){}}
+async function getViewerCount(){try{const since=new Date(Date.now()-30000).toISOString();const{count}=await sb.from('viewers').select('*',{count:'exact',head:true}).gte('last_seen',since);if(count!==null&&count!==lastKnownViewerCount){lastKnownViewerCount=count;document.getElementById('viewerCount').textContent=count;}}catch(e){}}
+
+document.getElementById('chatUser').addEventListener('input',function(){if(this.value.trim()==='صوفي ال دليم'&&localStorage.getItem('owner_verified')!=='true')document.getElementById('secretCodeSection').style.display='block';else document.getElementById('secretCodeSection').style.display='none'});
+document.getElementById('chatMsg').addEventListener('keypress',function(e){if(e.key==='Enter')sendChat()});
+
+function extractYoutubeId(url){
+  if(!url) return {id:'', type:''}; url = url.trim();
+  if(/^[a-zA-Z0-9_-]{11}$/.test(url)) return {id:url, type:'video'};
+  const reg = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/|shorts\/)|(?:(?:watch|\?vvi?=|\&vvi?=)(?:\?v=)?))([^#\&\?]*).*/;
+  const m = url.match(reg); return (m&&m[1]&&m[1].trim().length===11)?{id:m[1].trim(),type:'video'}:{id:'',type:''};
+}
+
+async function controlCenterLoop(){
+  const{data:config}=await sb.from('channel_settings').select('*').eq('id','live_stream').single(); if(!config)return;
+  const nextTxt = config.ticker_text || "شـاشـة غيّر جوك TV ترحب بكم في البث المباشر الحصري _ إدارة القناة: صوفي ال دليم _ لمتابعتنا والتواصل معنا عبر انستغرام: 6.2nr";
+  document.getElementById('tickerText').textContent = nextTxt;
+  currentVolume=config.volume!==undefined?config.volume:100;
+  if(player&&isUnmuted){player.setVolume(currentVolume)}
+  
+  const{data:songs}=await sb.from('playlist').select('*').order('id');
+  if(songs&&songs.length>0){
+    const s=Math.floor(Date.now()/SONG_DURATION_MS); if(s!==lastSlot){localIndexOffset=0;lastSlot=s}
+    const i=(s+localIndexOffset)%songs.length; const res=extractYoutubeId(songs[i].video_url);
+    if(player&&currentVideoId!==res.id&&res.id){currentVideoId=res.id; player.loadVideoById({videoId:res.id}); if(isUnmuted)player.playVideo();}
+  }
+}
+
+// ═══ ذكاء الرد التلقائي للبوت ═══
+function checkBotReply(msgId, username, text) {
+    if(username === 'غيّر جوك TV 🤖' || username === '📢 أمر نظام الإشراف' || processedMsgIds.has(msgId)) return;
+    processedMsgIds.add(msgId);
+    
+    let replyText = "";
+    const cleanText = text.toLowerCase().trim();
+    
+    if(cleanText.includes("هلاو") || cleanText.includes("هلو") || cleanText.includes("هاي") || cleanText.includes("مرحبا")) {
+        const replies = ["أهلاً وسهلاً بك نورتنا وغيّرت جونا بقناتنا! ✨", "يا هلا وغلا بيك نورت البث المباشر 🎧", "مرحباً يا غالي، منور الدردشة والبث! 🎸"];
+        replyText = replies[Math.floor(Math.random() * replies.length)];
+    } else if(cleanText.includes("السلام عليكم") || cleanText.includes("سلام")) {
+        replyText = "وعليكم السلام ورحمة الله وبركاته، يا ميت أهلاً وسهلاً بيك نورتنا 🌸";
+    } else if(cleanText.includes("صوفي")) {
+        replyText = "صوفي ال دليم حالياً يتابع البث ويدير القناة، نورتنا يا طيب 👑";
+    } else if(cleanText.includes("شلونكم") || cleanText.includes("اخباركم")) {
+        replyText = "الحمد لله عيوني، إحنا بخير طول ما إنت دتغيّر جوك معانا ومستمتع بالبث! 🥰";
+    }
+    
+    if(replyText !== "") {
+        setTimeout(async () => {
+            await sb.from('channel_chat').insert([{username: 'غيّر جوك TV 🤖', message: `@${username} ${replyText}`}]);
+            fetchLiveChat();
+        }, 2000); // الرد بعد ثانيتين حتى يبدو طبيعياً
+    }
+}
+
+async function fetchLiveChat(){
+  if(localStorage.getItem('user_banned_status')==='true'){document.getElementById('chatBox').innerHTML='<div style="color:#ff2a3b;text-align:center;font-weight:900;padding:20px;">تم حظرك نهائياً من الدردشة!</div>';return}
+  const{data}=await sb.from('channel_chat').select('*').order('id',{ascending:false}).limit(40); if(!data)return;
+  const box=document.getElementById('chatBox'), myName=document.getElementById('chatUser').value.trim();
+  const wasAtBottom=box.scrollHeight-box.clientHeight<=box.scrollTop+50;
+  const currentCount=data.length; const hasNewMsgs=currentCount>lastMsgCount; lastMsgCount=currentCount;
+  
+  let html='';
+  data.reverse().forEach((m,i)=>{
+    if(m.username==='📢 أمر نظام الإشراف'){
+      if(m.message==='CLEAR_SCREEN'){html='';return}
+      if(m.message.startsWith('BAN_USER:') && myName===m.message.split('BAN_USER:')[1]) localStorage.setItem('user_banned_status','true');
+      if(m.message.startsWith('MUTE_USER:') && myName===m.message.split('MUTE_USER:')[1]) localStorage.setItem('user_muted_status','true');
+      return;
+    }
+    
+    // تشغيل فحص البوت للرسائل الجديدة القادمة من المستخدمين
+    if(hasNewMsgs && i === data.length - 1) {
+        checkBotReply(m.id, m.username, m.message);
+    }
+    
+    let isOwner = m.username==='صوفي ال دليم';
+    let isBot = m.username==='غيّر جوك TV 🤖';
+    
+    let authorHtml = '';
+    let cls = 'yt-message';
+    let ts = '';
+    
+    if (isOwner) {
+        authorHtml = `<span class="owner-name"><i class="fa-solid fa-crown"></i> ${m.username}</span><span class="owner-colon">:</span>`;
+        cls += ' owner-msg';
+        ts = 'color:#ffd740;font-weight:700';
+    } else if (isBot) {
+        authorHtml = `<span class="bot-name"><i class="fa-solid fa-robot"></i> ${m.username}</span><span class="bot-colon">:</span>`;
+        cls += ' bot-msg';
+        ts = 'color:#00f2fe;font-weight:700';
+    } else {
+        authorHtml = `<span class="yt-author">${m.username}:</span>`;
+    }
+    
+    let modBtns='';
+    if(window.isAdminMode&&!isOwner&&!isBot){modBtns=`<div class="mod-actions"><span class="mod-btn mute" onclick="triggerAction('MUTE','${m.username}')">كتم</span><span class="mod-btn ban" onclick="triggerAction('BAN','${m.username}')">حظر</span></div>`}
+    if(hasNewMsgs&&i>=currentCount-3) cls+=' new-msg';
+    html+=`<div class="${cls}">${modBtns}${authorHtml} <span class="yt-text" style="${ts}">${m.message}</span></div>`;
+  });
+  box.innerHTML=html; if(wasAtBottom||hasNewMsgs) box.scrollTop=box.scrollHeight;
+}
+
+async function sendChat(){
+  if(localStorage.getItem('user_banned_status')==='true') return;
+  const u=document.getElementById('chatUser').value.trim(), m=document.getElementById('chatMsg'); if(!u||!m.value.trim())return;
+  if(u==='صوفي ال دليم'&&localStorage.getItem('owner_verified')!=='true'){
+      if(document.getElementById('adminCode').value.trim()!=='3TX') return;
+      localStorage.setItem('owner_verified','true'); window.isAdminMode=true;
+      document.getElementById('adminPanel').style.display='flex'; document.getElementById('secretCodeSection').style.display='none';
+  } else if (u !== 'صوفي ال دليم') {
+      if(localStorage.getItem('user_muted_status')==='true') return;
+      localStorage.setItem('locked_chat_username',u); document.getElementById('chatUser').disabled=true;
+  }
+  await sb.from('channel_chat').insert([{username:u,message:m.value.trim()}]); m.value=''; fetchLiveChat();
+}
+
+async function clearAllChatGlobal(){if(!window.isAdminMode)return;await sb.from('channel_chat').delete().gt('id',0);await sb.from('channel_chat').insert([{username:'📢 أمر نظام الإشراف',message:'CLEAR_SCREEN'}]);fetchLiveChat()}
+async function triggerAction(actionType,targetUser){if(!window.isAdminMode||targetUser==='صوفي ال دليم'||targetUser==='غيّر جوك TV 🤖')return; if(actionType==='BAN')await sb.from('channel_chat').insert([{username:'📢 أمر نظام الإشراف',message:`BAN_USER:${targetUser}`}]); if(actionType==='MUTE')await sb.from('channel_chat').insert([{username:'📢 أمر نظام الإشراف',message:`MUTE_USER:${targetUser}`}]);}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  checkSavedOwner(); const su=localStorage.getItem('locked_chat_username');
+  if(su&&su!=='صوفي ال دليم'){const uf=document.getElementById('chatUser'); if(uf){uf.value=su;uf.disabled=true}}
+  // تعبئة الـ Set بالرسائل القديمة حتى لا يقوم البوت بالرد عليها دفعة واحدة عند فتح الصفحة
+  sb.from('channel_chat').select('id').order('id',{ascending:false}).limit(40).then(({data})=>{if(data)data.forEach(m=>processedMsgIds.add(m.id))});
+});
+
+setInterval(()=>{controlCenterLoop();fetchLiveChat()},2000);
+setInterval(pingViewer,10000); setInterval(getViewerCount,5000);
+pingViewer(); fetchLiveChat();
+</script>
+</body>
+</html>
