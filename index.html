@@ -67,7 +67,7 @@ body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;mi
 .post-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px}
 .post-user{display:flex;gap:10px;align-items:center;flex:1}
 
-.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0;overflow:hidden}
+.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0;overflow:hidden;background:#6366f1}
 .avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .avatar-sm{width:28px;height:28px;font-size:11px}
 
@@ -110,7 +110,7 @@ body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;mi
 .muted-msg{background:rgba(251,191,36,.08);color:#fbbf24;padding:12px;border-radius:12px;text-align:center;font-size:14px;margin-bottom:14px;border:1px solid rgba(251,191,36,.2)}
 .banned-msg{background:rgba(239,68,68,.08);color:#fca5a5;padding:16px;border-radius:12px;text-align:center;font-size:15px;border:1px solid rgba(239,68,68,.2)}
 
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;border:1px solid #374151;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;z-index:400;font-weight:600;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;border:1px solid #374151;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;z-index:400;font-weight:600;pointer-events:none;white-space:nowrap;transition:opacity .2s}
 .toast.show{opacity:1}
 </style>
 </head>
@@ -151,23 +151,22 @@ body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;mi
     <div id="mutedBox" class="muted-msg hide">🔇 تم كتمك مؤقتاً</div>
     <div id="adminBar" class="admin-bar hide">🟢 مرحباً صوفي - أنت مالك المنصة</div>
 
-    <!-- رفع الصورة خاص بك فقط -->
+    <!-- قسم الأفاتار متاح للمالك فقط -->
     <div id="avatarSection" class="avatar-section hide">
       <div style="color:#9ca3af;font-size:13px;margin-bottom:10px;font-weight:700">تغيير صورتك الشخصية</div>
       <div class="avatar-row">
         <div id="previewAvatar" class="avatar av-big" style="background:#6366f1">?</div>
         <div>
           <label for="avatarFile">📷 اختر صورة أو GIF</label>
-          <input type="file" id="avatarFile" accept="image/*,.gif"/>
+          <input type="file" id="avatarFile" accept="image/*"/>
           <div style="margin-top:6px">
             <button id="saveAvatarBtn" class="btn btn-primary btn-sm hide">حفظ الصورة</button>
           </div>
         </div>
       </div>
-      <div class="hint">هذه الميزة متاحة لمالك الموقع فقط</div>
+      <div class="hint">الصورة ستنحفظ مباشرة وتظهر للجميع</div>
     </div>
 
-    <!-- كتابة المنشور (بدون صور) -->
     <div id="composeBox" class="compose">
       <div class="compose-top">
         <div id="myAvatar" class="avatar" style="background:#6366f1">?</div>
@@ -235,7 +234,7 @@ function buildBadges(u, showStatus) {
   let h = '';
   if (u.is_verified) h += '<span class="vbadge">✓</span>';
   if (u.is_admin) h += '<span class="owner-tag">مالك</span>';
-  if (showStatus && me && me.is_admin && !u.is_admin) {
+  if (showStatus && me.is_admin && !u.is_admin) {
     if (u.is_banned) h += '<span class="status-tag banned">محظور</span>';
     else if (u.is_muted) h += '<span class="status-tag muted">مكتوم</span>';
   }
@@ -343,21 +342,19 @@ function startApp() {
   if (me.is_admin) {
     $('adminBar').classList.remove('hide');
     $('avatarSection').classList.remove('hide');
-    updateMyAvatarElements();
-  } else {
-    updateMyAvatarElements();
   }
-
+  
+  updateMyAvatarElements();
   loadFeed();
   startRealtime();
   setInterval(() => { if (me && !me.is_banned) loadFeed(true); }, 3000);
 }
 
-// ===== AVATAR UPLOAD (ADMIN ONLY) FIX =====
+// ===== AVATAR UPLOAD (BASE64 - تخطي Storage) =====
 $('avatarFile').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
-  if (file.size > 10 * 1024 * 1024) { toast('الحد 10MB'); return; }
+  if (file.size > 4 * 1024 * 1024) { toast('الحد الأقصى 4MB'); return; }
 
   selectedAvatarFile = file;
 
@@ -378,39 +375,43 @@ $('saveAvatarBtn').addEventListener('click', async function() {
 
   const btn = this;
   btn.disabled = true;
-  btn.textContent = 'جاري الرفع...';
+  btn.textContent = 'جاري الحفظ...';
 
   try {
-    const ext = selectedAvatarFile.name.split('.').pop().toLowerCase();
-    // إنشاء اسم فريد في كل مرة و upsert: false لحل مشكلة الـ RLS
-    const safeName = 'avatar_' + Date.now() + '_' + Math.floor(Math.random()*1000) + '.' + ext;
-    const contentType = selectedAvatarFile.type || 'image/gif';
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64Image = e.target.result;
 
-    const { data: uploaded, error: uploadError } = await supabase.storage
-      .from('images')
-      .upload(safeName, selectedAvatarFile, {
-        contentType: contentType,
-        upsert: false 
-      });
+      const { error: dbError } = await supabase
+        .from('users')
+        .update({ avatar_url: base64Image })
+        .eq('id', me.id);
 
-    if (uploadError) throw new Error('تأكد من فتح صلاحيات الـ SQL للصور');
+      if (dbError) {
+        toast('خطأ بقاعدة البيانات');
+        btn.disabled = false;
+        btn.textContent = 'حفظ الصورة';
+        return;
+      }
 
-    const { data: urlData } = supabase.storage.from('images').getPublicUrl(safeName);
-    const publicUrl = urlData.publicUrl;
-
-    const { error: dbError } = await supabase.from('users').update({ avatar_url: publicUrl }).eq('id', me.id);
-    if (dbError) throw new Error('فشل التحديث');
-
-    me.avatar_url = publicUrl;
-    updateMyAvatarElements();
-    selectedAvatarFile = null;
-    $('saveAvatarBtn').classList.add('hide');
-    toast('تم تحديث صورتك ✨');
-    await loadFeed();
-
+      me.avatar_url = base64Image;
+      updateMyAvatarElements();
+      selectedAvatarFile = null;
+      $('saveAvatarBtn').classList.add('hide');
+      toast('تم تحديث صورتك ✨');
+      await loadFeed();
+      
+      btn.disabled = false;
+      btn.textContent = 'حفظ الصورة';
+    };
+    reader.onerror = function() {
+      toast('فشل قراءة ملف الصورة');
+      btn.disabled = false;
+      btn.textContent = 'حفظ الصورة';
+    };
+    reader.readAsDataURL(selectedAvatarFile);
   } catch (e) {
-    toast(e.message || 'فشل');
-  } finally {
+    toast(e.message || 'فشل غير متوقع');
     btn.disabled = false;
     btn.textContent = 'حفظ الصورة';
   }
@@ -481,7 +482,7 @@ function renderAllPosts() {
     const postComments = commentsMap[post.id] || [];
     const postLikes = likesMap[post.id] || [];
     const isLiked = postLikes.some(l => l.user_id === me.id);
-    const canManage = (post.user_id === me.id) || (me && me.is_admin);
+    const canManage = (post.user_id === me.id) || me.is_admin;
 
     let menuItems = '';
     if (canManage) {
@@ -559,7 +560,7 @@ function renderAllPosts() {
 async function createPost() {
   if (me.is_banned || me.is_muted) return;
   const txt = $('postInput').value.trim();
-  if (!txt) { toast('اكتب شي بالمنشور'); return; }
+  if (!txt) { toast('اكتب شي'); return; }
 
   $('postBtn').disabled = true;
 
@@ -580,8 +581,11 @@ window._toggleLike = async function(pid) {
   if (me.is_banned) return;
   const existing = (likesMap[pid] || []).find(l => l.user_id === me.id);
   try {
-    if (existing) await supabase.from('likes').delete().eq('id', existing.id);
-    else await supabase.from('likes').insert([{ post_id: pid, user_id: me.id }]);
+    if (existing) {
+      await supabase.from('likes').delete().eq('id', existing.id);
+    } else {
+      await supabase.from('likes').insert([{ post_id: pid, user_id: me.id }]);
+    }
     await loadFeed(true);
   } catch (e) { toast(e.message); }
 };
@@ -686,7 +690,9 @@ $('postInput').addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'En
         startApp();
         return;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('Init error:', e);
+    }
     localStorage.removeItem('chat_session');
   }
 })();
