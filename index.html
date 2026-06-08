@@ -3,146 +3,153 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>إدارة - دردشة لايف بغداد</title>
+<title>دردشة لايف بغداد</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Tahoma,Arial,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
 
-.header{background:#111827;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
-.header .logo{font-size:20px;font-weight:bold;color:#fff}
+.header{background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.header .logo{font-size:22px;font-weight:bold;color:#fff}
 .header .logo span{color:#fbbf24}
-.header .logo .admin-tag{background:#ef4444;color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;margin-right:8px}
+.header .user-area{display:flex;gap:10px;align-items:center}
+.header .user-area .uname{color:#fff;font-weight:bold;font-size:14px}
 
-.login-box{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:200}
-.login-card{background:#1e293b;padding:30px 24px;border-radius:20px;width:360px;max-width:95%}
-.login-card h2{text-align:center;color:#fff;margin-bottom:20px}
-.login-card label{display:block;font-size:13px;color:#94a3b8;margin-bottom:6px}
-.login-card input{width:100%;height:44px;background:#0f172a;border:2px solid #334155;border-radius:12px;color:#fff;padding:0 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:14px}
-.login-card input:focus{border-color:#6366f1}
-.login-card .err{color:#ef4444;font-size:13px;text-align:center;margin-bottom:10px;min-height:18px}
-.login-card button{width:100%;height:46px;background:#6366f1;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit}
+.btn{border:none;border-radius:10px;padding:8px 16px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:bold;transition:.2s}
+.btn-primary{background:#6366f1;color:#fff}
+.btn-primary:hover{background:#4f46e5}
+.btn-ghost{background:rgba(255,255,255,.15);color:#fff}
+.btn-ghost:hover{background:rgba(255,255,255,.25)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.vbadge{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#3b82f6;color:#fff;border-radius:50%;
+  width:18px;height:18px;font-size:11px;margin-right:4px;
+  vertical-align:middle;flex-shrink:0;
+}
+
+.owner-tag{
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;font-size:10px;padding:2px 8px;border-radius:6px;
+  margin-right:6px;font-weight:bold;
+}
+
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:200;padding:15px}
+.auth-box{background:#1e293b;border-radius:20px;padding:30px 24px;width:380px;max-width:100%}
+.auth-box h2{text-align:center;margin-bottom:6px;color:#fff;font-size:22px}
+.auth-box .sub{text-align:center;color:#94a3b8;font-size:13px;margin-bottom:24px}
+.auth-box label{display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;font-weight:bold}
+.auth-box input{width:100%;height:44px;background:#0f172a;border:2px solid #334155;border-radius:12px;color:#fff;padding:0 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:14px}
+.auth-box input:focus{border-color:#6366f1}
+.auth-box .err{color:#ef4444;font-size:13px;text-align:center;margin-bottom:10px;min-height:18px}
+.auth-box .switch{text-align:center;margin-top:14px;font-size:13px;color:#94a3b8}
+.auth-box .switch a{color:#818cf8;cursor:pointer;text-decoration:underline}
 
 .hide{display:none!important}
 
-.tabs{display:flex;gap:0;background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto}
-.tab{padding:14px 24px;cursor:pointer;color:#94a3b8;font-weight:bold;font-size:14px;border-bottom:3px solid transparent;white-space:nowrap}
-.tab:hover{color:#fff}
-.tab.active{color:#6366f1;border-bottom-color:#6366f1}
+.feed{max-width:620px;margin:20px auto;padding:0 12px}
 
-.panel{padding:16px;max-width:1200px;margin:0 auto}
-.panel.hide{display:none}
+.compose-box{background:#1e293b;border-radius:16px;padding:16px;margin-bottom:20px}
+.compose-box textarea{width:100%;min-height:70px;max-height:150px;resize:vertical;background:#0f172a;border:2px solid #334155;border-radius:12px;color:#fff;padding:12px;font-size:14px;font-family:inherit;outline:none}
+.compose-box textarea:focus{border-color:#6366f1}
+.compose-box .bottom{display:flex;justify-content:flex-end;margin-top:10px}
 
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
-.stat{background:#1e293b;padding:16px;border-radius:14px;border:1px solid #334155}
-.stat .label{color:#94a3b8;font-size:13px;margin-bottom:6px}
-.stat .val{font-size:26px;font-weight:bold;color:#fff}
+.post{background:#1e293b;border-radius:16px;padding:16px;margin-bottom:16px;border:1px solid #334155}
+.post-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.post-user{display:flex;align-items:center;gap:10px}
+.avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:16px;flex-shrink:0}
+.post-name-wrap{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.post-name{font-weight:bold;font-size:15px;color:#fff}
+.post-uname{font-size:12px;color:#64748b}
+.post-time{font-size:12px;color:#64748b}
+.post-content{font-size:15px;line-height:1.8;margin-bottom:12px;white-space:pre-wrap;word-break:break-word}
+.post-actions{display:flex;gap:16px;align-items:center;padding-top:10px;border-top:1px solid #334155}
+.action-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:13px;font-family:inherit;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px}
+.action-btn:hover{background:#334155;color:#fff}
+.action-btn.liked{color:#ef4444}
 
-.search-bar{margin-bottom:14px}
-.search-bar input{width:100%;max-width:400px;height:40px;background:#1e293b;border:1px solid #334155;border-radius:10px;color:#fff;padding:0 12px;font-size:14px;font-family:inherit;outline:none}
-.search-bar input:focus{border-color:#6366f1}
+.comments-section{margin-top:12px;padding-top:10px;border-top:1px solid #334155}
+.comment{display:flex;gap:8px;margin-bottom:10px;align-items:flex-start}
+.comment .c-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:bold;flex-shrink:0}
+.comment .c-body{background:#0f172a;border-radius:12px;padding:8px 12px;flex:1}
+.comment .c-name-wrap{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:2px}
+.comment .c-name{font-size:12px;font-weight:bold;color:#fff}
+.comment .c-text{font-size:13px;color:#cbd5e1;line-height:1.5}
+.comment .c-time{font-size:11px;color:#64748b;margin-top:2px}
 
-table{width:100%;border-collapse:collapse;background:#1e293b;border-radius:14px;overflow:hidden}
-th,td{padding:12px;text-align:center;font-size:13px;border-bottom:1px solid #334155}
-th{background:#111827;color:#94a3b8;font-size:12px}
-td{color:#e2e8f0}
+.comment-input{display:flex;gap:8px;margin-top:8px}
+.comment-input input{flex:1;height:36px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;padding:0 10px;font-size:13px;font-family:inherit;outline:none}
+.comment-input input:focus{border-color:#6366f1}
+.comment-input button{height:36px;padding:0 14px;background:#6366f1;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:inherit}
 
-.badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:bold}
-.badge.green{background:#dcfce7;color:#166534}
-.badge.red{background:#fee2e2;color:#991b1b}
-.badge.yellow{background:#fef3c7;color:#92400e}
-.badge.blue{background:#dbeafe;color:#1d4ed8}
-.badge.gray{background:#f3f4f6;color:#374151}
-
-.verified{color:#3b82f6;font-size:12px}
-
-.btn{border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:bold;transition:.2s}
-.btn-ban{background:#ef4444;color:#fff}
-.btn-unban{background:#10b981;color:#fff}
-.btn-mute{background:#f59e0b;color:#fff}
-.btn-unmute{background:#06b6d4;color:#fff}
-.btn-del{background:#64748b;color:#fff}
-.btn:hover{opacity:.85}
-
-.post-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:14px;margin-bottom:12px}
-.post-card .p-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
-.post-card .p-user{font-weight:bold;font-size:14px;color:#fff}
-.post-card .p-time{font-size:12px;color:#64748b}
-.post-card .p-content{font-size:14px;line-height:1.7;margin-bottom:8px;white-space:pre-wrap;word-break:break-word}
-.post-card .p-footer{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.post-card .p-stat{font-size:12px;color:#94a3b8}
-
-.comment-row{background:#0f172a;border-radius:10px;padding:10px 12px;margin-bottom:8px}
-.comment-row .cr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:6px}
-.comment-row .cr-name{font-weight:bold;font-size:13px;color:#fff}
-.comment-row .cr-time{font-size:11px;color:#64748b}
-.comment-row .cr-text{font-size:13px;color:#cbd5e1}
+.empty-feed{text-align:center;color:#64748b;padding:40px;font-size:15px}
 
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;opacity:0;transition:.3s;z-index:300;border:1px solid #334155}
 .toast.show{opacity:1}
 
-@media(max-width:600px){
-  th,td{padding:8px 4px;font-size:11px}
-  .btn{padding:4px 8px;font-size:11px}
+.muted-msg{background:#fef3c7;color:#92400e;padding:12px;border-radius:10px;text-align:center;font-size:14px;margin-bottom:16px}
+.banned-msg{background:#fee2e2;color:#991b1b;padding:20px;border-radius:10px;text-align:center;font-size:16px}
+
+@media(max-width:500px){
+.header{padding:10px 12px}
+.header .logo{font-size:18px}
+.feed{padding:0 8px}
 }
 </style>
 </head>
 <body>
 
-<!-- شاشة دخول الأدمن -->
-<div id="loginBox" class="login-box">
-  <div class="login-card">
-    <h2>دخول الإدارة</h2>
-    <label>اسم المستخدم</label>
-    <input id="aUser" type="text" placeholder="اسم المستخدم"/>
-    <label>كلمة المرور</label>
-    <input id="aPass" type="password" placeholder="كلمة المرور"/>
-    <div id="aErr" class="err"></div>
-    <button id="aBtn" onclick="doLogin()">دخول</button>
+<div class="header">
+  <div class="logo">دردشة لايف.<span>بغداد</span></div>
+  <div class="user-area">
+    <span id="headerUser" class="uname"></span>
+    <button id="logoutBtn" class="btn btn-ghost btn-sm hide">خروج</button>
   </div>
 </div>
 
-<div id="mainApp" class="hide">
-  <div class="header">
-    <div class="logo">دردشة لايف.<span>بغداد</span> <span class="admin-tag">إدارة</span></div>
-  </div>
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-box">
+    <h2 id="authTitle">تسجيل الدخول</h2>
+    <p class="sub">دردشة لايف بغداد</p>
 
-  <div class="tabs">
-    <div class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">الرئيسية</div>
-    <div class="tab" data-tab="users" onclick="switchTab('users')">المستخدمين</div>
-    <div class="tab" data-tab="posts" onclick="switchTab('posts')">المنشورات</div>
-    <div class="tab" data-tab="comments" onclick="switchTab('comments')">التعليقات</div>
-  </div>
+    <div id="nameField" class="hide">
+      <label>الاسم الظاهر</label>
+      <input id="displayInput" type="text" placeholder="اسمك الظاهر للجميع"/>
+    </div>
 
-  <!-- الرئيسية -->
-  <div id="panel-dashboard" class="panel">
-    <div class="stats">
-      <div class="stat"><div class="label">المستخدمين</div><div class="val" id="sUsers">0</div></div>
-      <div class="stat"><div class="label">المنشورات</div><div class="val" id="sPosts">0</div></div>
-      <div class="stat"><div class="label">التعليقات</div><div class="val" id="sComments">0</div></div>
-      <div class="stat"><div class="label">الإعجابات</div><div class="val" id="sLikes">0</div></div>
-      <div class="stat"><div class="label">محظورين</div><div class="val" id="sBanned">0</div></div>
-      <div class="stat"><div class="label">مكتومين</div><div class="val" id="sMuted">0</div></div>
+    <label>اسم المستخدم</label>
+    <input id="userInput" type="text" placeholder="اسم المستخدم"/>
+
+    <label>كلمة المرور</label>
+    <input id="passInput" type="password" placeholder="كلمة المرور"/>
+
+    <div id="authErr" class="err"></div>
+    <button id="authBtn" class="btn btn-primary" style="width:100%;height:46px;font-size:15px">دخول</button>
+
+    <div class="switch">
+      <span id="switchText">ما عندك حساب؟</span>
+      <a id="switchLink">إنشاء حساب</a>
     </div>
   </div>
+</div>
 
-  <!-- المستخدمين -->
-  <div id="panel-users" class="panel hide">
-    <div class="search-bar"><input id="userSearch" placeholder="بحث بالاسم..." oninput="renderUsers()"/></div>
-    <div style="overflow-x:auto">
-      <table><thead><tr>
-        <th>الاسم</th><th>اليوزر</th><th>الحالة</th><th>تاريخ التسجيل</th><th>إجراءات</th>
-      </tr></thead><tbody id="usersTable"></tbody></table>
+<div id="mainContent" class="hide">
+  <div class="feed" id="feed">
+
+    <div id="bannedBox" class="banned-msg hide">تم حظر حسابك من قبل الإدارة</div>
+    <div id="mutedBox" class="muted-msg hide">تم كتمك - لا يمكنك النشر أو التعليق حالياً</div>
+
+    <div id="composeBox" class="compose-box">
+      <textarea id="postInput" placeholder="شنو تفكر؟ شارك رأيك..."></textarea>
+      <div class="bottom">
+        <button id="postBtn" class="btn btn-primary">نشر</button>
+      </div>
     </div>
-  </div>
 
-  <!-- المنشورات -->
-  <div id="panel-posts" class="panel hide">
-    <div id="postsPanel"></div>
-  </div>
-
-  <!-- التعليقات -->
-  <div id="panel-comments" class="panel hide">
-    <div id="commentsPanel"></div>
+    <div id="postsArea">
+      <div class="empty-feed">جاري التحميل...</div>
+    </div>
   </div>
 </div>
 
@@ -157,188 +164,302 @@ const supabase=createClient(
 );
 
 const $=id=>document.getElementById(id);
-let admin=null;
-let users=[],posts=[],comments=[],likes=[];
+let me=null;
+let isLogin=true;
+let posts=[];
+let allUsers={};
+let allComments={};
+let allLikes={};
 
 function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function dateF(d){return d?new Date(d).toLocaleDateString('ar-IQ'):''}
-function timeAgo(d){if(!d)return'';const s=Math.floor((Date.now()-new Date(d))/1e3);if(s<60)return'الآن';if(s<3600)return Math.floor(s/60)+' د';if(s<86400)return Math.floor(s/3600)+' س';return Math.floor(s/86400)+' يوم'}
+function timeAgo(d){if(!d)return'';const s=Math.floor((Date.now()-new Date(d))/1e3);if(s<60)return'الآن';if(s<3600)return Math.floor(s/60)+' د';if(s<86400)return Math.floor(s/3600)+' س';return Math.floor(s/86400)+' ي'}
 function toast(m){$('toast').textContent=m;$('toast').classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>$('toast').classList.remove('show'),2500)}
+function initial(n){return(n||'?')[0].toUpperCase()}
 
-// ===== LOGIN =====
-window.doLogin=async function(){
-  const u=$('aUser').value.trim();
-  const p=$('aPass').value.trim();
-  if(!u||!p){$('aErr').textContent='أدخل البيانات';return}
-
-  $('aBtn').disabled=true;
-  try{
-    const{data,error}=await supabase.from('users').select('*').eq('username',u).eq('password',p).eq('is_admin',true).single();
-    if(error||!data)throw new Error('بيانات خاطئة أو مو أدمن');
-    admin=data;
-    $('loginBox').classList.add('hide');
-    $('mainApp').classList.remove('hide');
-    await loadAll();
-    startRealtime();
-  }catch(e){$('aErr').textContent=e.message}
-  finally{$('aBtn').disabled=false}
+function userBadges(u){
+  let html='';
+  if(u.is_verified) html+='<span class="vbadge" title="موثق">✓</span>';
+  if(u.is_admin) html+='<span class="owner-tag">مالك الموقع</span>';
+  return html;
 }
 
-$('aPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin()});
+// ========== AUTH ==========
+function toggleAuth(){
+  isLogin=!isLogin;
+  $('authTitle').textContent=isLogin?'تسجيل الدخول':'إنشاء حساب';
+  $('authBtn').textContent=isLogin?'دخول':'إنشاء حساب';
+  $('switchText').textContent=isLogin?'ما عندك حساب؟':'عندك حساب؟';
+  $('switchLink').textContent=isLogin?'إنشاء حساب':'تسجيل الدخول';
+  $('nameField').classList.toggle('hide',isLogin);
+  $('authErr').textContent='';
+}
 
-// ===== LOAD =====
-async function loadAll(){
-  const[uR,pR,cR,lR]=await Promise.all([
-    supabase.from('users').select('*').order('created_at',{ascending:false}),
-    supabase.from('posts').select('*').order('created_at',{ascending:false}),
-    supabase.from('comments').select('*').order('created_at',{ascending:false}),
+async function doAuth(){
+  const user=$('userInput').value.trim();
+  const pass=$('passInput').value.trim();
+  const display=$('displayInput').value.trim();
+
+  if(!user||!pass){$('authErr').textContent='أدخل اسم المستخدم وكلمة المرور';return}
+  if(!isLogin&&!display){$('authErr').textContent='أدخل الاسم الظاهر';return}
+  if(!isLogin&&user.length<3){$('authErr').textContent='اسم المستخدم لازم 3 أحرف على الأقل';return}
+  if(!isLogin&&pass.length<4){$('authErr').textContent='كلمة المرور لازم 4 أحرف على الأقل';return}
+
+  $('authBtn').disabled=true;
+  $('authErr').textContent='';
+
+  try{
+    if(isLogin){
+      const{data,error}=await supabase.from('users').select('*').eq('username',user);
+      if(error)throw error;
+      if(!data||data.length===0)throw new Error('اسم المستخدم غير موجود');
+      const found=data[0];
+      if(found.password!==pass)throw new Error('كلمة المرور غلط');
+      if(found.is_banned)throw new Error('حسابك محظور من قبل الإدارة');
+      me=found;
+    }else{
+      const{data:exists}=await supabase.from('users').select('id').eq('username',user);
+      if(exists&&exists.length>0)throw new Error('اسم المستخدم موجود مسبقاً');
+
+      const colors=['#6366f1','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4'];
+      const color=colors[Math.floor(Math.random()*colors.length)];
+
+      const{data,error}=await supabase.from('users').insert([{
+        username:user,
+        display_name:display,
+        password:pass,
+        avatar_color:color
+      }]).select().single();
+      if(error)throw error;
+      me=data;
+    }
+
+    localStorage.setItem('chat_user',JSON.stringify({username:me.username,password:me.password}));
+    await supabase.from('users').update({last_seen:new Date().toISOString()}).eq('id',me.id);
+    showMain();
+  }catch(e){
+    $('authErr').textContent=e.message||'فشل';
+  }finally{
+    $('authBtn').disabled=false;
+  }
+}
+
+function showMain(){
+  $('authOverlay').classList.add('hide');
+  $('mainContent').classList.remove('hide');
+
+  $('headerUser').innerHTML=esc(me.display_name)+userBadges(me);
+  $('logoutBtn').classList.remove('hide');
+
+  if(me.is_banned){
+    $('bannedBox').classList.remove('hide');
+    $('composeBox').classList.add('hide');
+    return;
+  }
+
+  if(me.is_muted){
+    $('mutedBox').classList.remove('hide');
+    $('composeBox').classList.add('hide');
+  }
+
+  loadFeed();
+  startRealtime();
+}
+
+function logout(){
+  localStorage.removeItem('chat_user');
+  location.reload();
+}
+
+// ========== FEED ==========
+async function loadFeed(){
+  const[pRes,uRes,cRes,lRes]=await Promise.all([
+    supabase.from('posts').select('*').eq('is_deleted',false).order('created_at',{ascending:false}),
+    supabase.from('users').select('id,username,display_name,avatar_color,is_verified,is_admin,is_banned,is_muted'),
+    supabase.from('comments').select('*').eq('is_deleted',false).order('created_at',{ascending:true}),
     supabase.from('likes').select('*')
   ]);
-  users=uR.data||[];
-  posts=pR.data||[];
-  comments=cR.data||[];
-  likes=lR.data||[];
 
-  updateStats();
-  renderUsers();
+  allUsers={};
+  (uRes.data||[]).forEach(u=>allUsers[u.id]=u);
+
+  allComments={};
+  (cRes.data||[]).forEach(c=>{
+    if(!allComments[c.post_id])allComments[c.post_id]=[];
+    allComments[c.post_id].push(c);
+  });
+
+  allLikes={};
+  (lRes.data||[]).forEach(l=>{
+    if(!allLikes[l.post_id])allLikes[l.post_id]=[];
+    allLikes[l.post_id].push(l);
+  });
+
+  posts=pRes.data||[];
   renderPosts();
-  renderComments();
 }
 
-function updateStats(){
-  $('sUsers').textContent=users.length;
-  $('sPosts').textContent=posts.filter(p=>!p.is_deleted).length;
-  $('sComments').textContent=comments.filter(c=>!c.is_deleted).length;
-  $('sLikes').textContent=likes.length;
-  $('sBanned').textContent=users.filter(u=>u.is_banned).length;
-  $('sMuted').textContent=users.filter(u=>u.is_muted).length;
-}
-
-// ===== TABS =====
-window.switchTab=function(tab){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
-  ['dashboard','users','posts','comments'].forEach(p=>{
-    $('panel-'+p).classList.toggle('hide',p!==tab);
-  });
-}
-
-// ===== USERS =====
-function renderUsers(){
-  const q=($('userSearch')?.value||'').toLowerCase();
-  const filtered=users.filter(u=>{
-    if(u.id===admin.id)return false;
-    return(u.display_name||'').toLowerCase().includes(q)||(u.username||'').toLowerCase().includes(q);
-  });
-
-  $('usersTable').innerHTML=filtered.map(u=>{
-    const v=u.is_verified?'<span class="verified">✓</span>':'';
-    let status='<span class="badge green">عادي</span>';
-    if(u.is_banned)status='<span class="badge red">محظور</span>';
-    else if(u.is_muted)status='<span class="badge yellow">مكتوم</span>';
-
-    return`<tr>
-      <td>${esc(u.display_name)}${v}</td>
-      <td>${esc(u.username)}</td>
-      <td>${status}</td>
-      <td>${dateF(u.created_at)}</td>
-      <td>
-        ${u.is_banned
-          ?`<button class="btn btn-unban" onclick="toggleBan('${u.id}',false)">فك الحظر</button>`
-          :`<button class="btn btn-ban" onclick="toggleBan('${u.id}',true)">حظر</button>`}
-        ${u.is_muted
-          ?`<button class="btn btn-unmute" onclick="toggleMute('${u.id}',false)">فك الكتم</button>`
-          :`<button class="btn btn-mute" onclick="toggleMute('${u.id}',true)">كتم</button>`}
-      </td>
-    </tr>`;
-  }).join('')||'<tr><td colspan="5">ماكو مستخدمين</td></tr>';
-}
-window.renderUsers=renderUsers;
-
-window.toggleBan=async function(id,ban){
-  await supabase.from('users').update({is_banned:ban}).eq('id',id);
-  toast(ban?'تم الحظر':'تم فك الحظر');
-  await loadAll();
-}
-
-window.toggleMute=async function(id,mute){
-  await supabase.from('users').update({is_muted:mute}).eq('id',id);
-  toast(mute?'تم الكتم':'تم فك الكتم');
-  await loadAll();
-}
-
-// ===== POSTS =====
 function renderPosts(){
-  const userMap={};
-  users.forEach(u=>userMap[u.id]=u);
+  const area=$('postsArea');
 
-  $('postsPanel').innerHTML=posts.filter(p=>!p.is_deleted).map(p=>{
-    const u=userMap[p.user_id]||{};
-    const v=u.is_verified?'<span class="verified">✓</span>':'';
-    const pLikes=likes.filter(l=>l.post_id===p.id).length;
-    const pComments=comments.filter(c=>c.post_id===p.id&&!c.is_deleted).length;
+  if(!posts.length){
+    area.innerHTML='<div class="empty-feed">ماكو منشورات بعد - كون أول واحد ينشر!</div>';
+    return;
+  }
 
-    return`
-      <div class="post-card">
-        <div class="p-head">
-          <span class="p-user">${esc(u.display_name||'مجهول')}${v} <span style="color:#64748b;font-weight:normal">@${esc(u.username||'')}</span></span>
-          <span class="p-time">${timeAgo(p.created_at)}</span>
-        </div>
-        <div class="p-content">${esc(p.content)}</div>
-        <div class="p-footer">
-          <span class="p-stat">❤️ ${pLikes}</span>
-          <span class="p-stat">💬 ${pComments}</span>
-          <button class="btn btn-del" onclick="delPost('${p.id}')">حذف المنشور</button>
-        </div>
-      </div>`;
-  }).join('')||'<div style="text-align:center;color:#64748b;padding:30px">ماكو منشورات</div>';
-}
+  area.innerHTML=posts.map(p=>{
+    const u=allUsers[p.user_id]||{};
+    const cmts=allComments[p.id]||[];
+    const lks=allLikes[p.id]||[];
+    const liked=lks.some(l=>l.user_id===me.id);
 
-window.delPost=async function(id){
-  if(!confirm('متأكد تحذف هذا المنشور؟'))return;
-  await supabase.from('posts').update({is_deleted:true}).eq('id',id);
-  toast('تم حذف المنشور');
-  await loadAll();
-}
+    let cmtsHtml=cmts.map(c=>{
+      const cu=allUsers[c.user_id]||{};
+      return`
+        <div class="comment">
+          <div class="c-avatar" style="background:${esc(cu.avatar_color||'#666')}">${initial(cu.display_name)}</div>
+          <div class="c-body">
+            <div class="c-name-wrap">
+              <span class="c-name">${esc(cu.display_name||'مجهول')}</span>
+              ${userBadges(cu)}
+              <span class="c-time">${timeAgo(c.created_at)}</span>
+            </div>
+            <div class="c-text">${esc(c.content)}</div>
+          </div>
+        </div>`;
+    }).join('');
 
-// ===== COMMENTS =====
-function renderComments(){
-  const userMap={};
-  users.forEach(u=>userMap[u.id]=u);
-
-  $('commentsPanel').innerHTML=comments.filter(c=>!c.is_deleted).map(c=>{
-    const u=userMap[c.user_id]||{};
-    const v=u.is_verified?'<span class="verified">✓</span>':'';
+    const canInteract=!me.is_banned&&!me.is_muted;
+    const commentInput=canInteract?`
+      <div class="comment-input">
+        <input type="text" placeholder="اكتب تعليق..." data-pid="${p.id}"/>
+        <button onclick="addComment('${p.id}',this)">رد</button>
+      </div>`:'';
 
     return`
-      <div class="comment-row">
-        <div class="cr-head">
-          <span class="cr-name">${esc(u.display_name||'مجهول')}${v}</span>
-          <div style="display:flex;gap:6px;align-items:center">
-            <span class="cr-time">${timeAgo(c.created_at)}</span>
-            <button class="btn btn-del" onclick="delComment('${c.id}')">حذف</button>
+      <div class="post" id="post-${p.id}">
+        <div class="post-head">
+          <div class="post-user">
+            <div class="avatar" style="background:${esc(u.avatar_color||'#666')}">${initial(u.display_name)}</div>
+            <div>
+              <div class="post-name-wrap">
+                <span class="post-name">${esc(u.display_name||'مجهول')}</span>
+                ${userBadges(u)}
+              </div>
+              <div class="post-uname">@${esc(u.username||'')} · ${timeAgo(p.created_at)}</div>
+            </div>
           </div>
         </div>
-        <div class="cr-text">${esc(c.content)}</div>
+        <div class="post-content">${esc(p.content)}</div>
+        <div class="post-actions">
+          <button class="action-btn ${liked?'liked':''}" onclick="toggleLike('${p.id}')">
+            ${liked?'❤️':'🤍'} ${lks.length||''}
+          </button>
+          <button class="action-btn" onclick="toggleComments('${p.id}')">
+            💬 ${cmts.length||''}
+          </button>
+        </div>
+        <div class="comments-section hide" id="cmts-${p.id}">
+          ${cmtsHtml}
+          ${commentInput}
+        </div>
       </div>`;
-  }).join('')||'<div style="text-align:center;color:#64748b;padding:30px">ماكو تعليقات</div>';
+  }).join('');
 }
 
-window.delComment=async function(id){
-  if(!confirm('متأكد تحذف هذا التعليق؟'))return;
-  await supabase.from('comments').update({is_deleted:true}).eq('id',id);
-  toast('تم حذف التعليق');
-  await loadAll();
+// ========== نشر ==========
+async function createPost(){
+  if(me.is_banned||me.is_muted)return;
+  const txt=$('postInput').value.trim();
+  if(!txt){toast('اكتب شي أول');return}
+
+  $('postBtn').disabled=true;
+  try{
+    const{error}=await supabase.from('posts').insert([{user_id:me.id,content:txt}]);
+    if(error)throw error;
+    $('postInput').value='';
+    await loadFeed();
+    toast('تم النشر');
+  }catch(e){toast(e.message||'فشل النشر')}
+  finally{$('postBtn').disabled=false}
 }
 
-// ===== REALTIME =====
+// ========== لايك ==========
+window.toggleLike=async function(pid){
+  if(me.is_banned)return;
+  const lks=allLikes[pid]||[];
+  const existing=lks.find(l=>l.user_id===me.id);
+
+  try{
+    if(existing){
+      await supabase.from('likes').delete().eq('id',existing.id);
+    }else{
+      await supabase.from('likes').insert([{post_id:pid,user_id:me.id}]);
+    }
+    await loadFeed();
+  }catch(e){toast(e.message||'فشل')}
+}
+
+// ========== تعليقات ==========
+window.toggleComments=function(pid){
+  const el=$('cmts-'+pid);
+  el.classList.toggle('hide');
+}
+
+window.addComment=async function(pid,btn){
+  if(me.is_banned||me.is_muted)return;
+  const input=btn.previousElementSibling;
+  const txt=input.value.trim();
+  if(!txt)return;
+
+  btn.disabled=true;
+  try{
+    const{error}=await supabase.from('comments').insert([{post_id:pid,user_id:me.id,content:txt}]);
+    if(error)throw error;
+    input.value='';
+    await loadFeed();
+    setTimeout(()=>{
+      const el=$('cmts-'+pid);
+      if(el)el.classList.remove('hide');
+    },100);
+  }catch(e){toast(e.message||'فشل')}
+  finally{btn.disabled=false}
+}
+
+// ========== REALTIME ==========
 function startRealtime(){
-  supabase.channel('admin-panel')
-    .on('postgres_changes',{event:'*',schema:'public',table:'posts'},()=>loadAll())
-    .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>loadAll())
-    .on('postgres_changes',{event:'*',schema:'public',table:'likes'},()=>loadAll())
-    .on('postgres_changes',{event:'*',schema:'public',table:'users'},()=>loadAll())
+  supabase.channel('feed-live')
+    .on('postgres_changes',{event:'*',schema:'public',table:'posts'},()=>loadFeed())
+    .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>loadFeed())
+    .on('postgres_changes',{event:'*',schema:'public',table:'likes'},()=>loadFeed())
     .subscribe();
 }
+
+// ========== أحداث ==========
+$('switchLink').addEventListener('click',toggleAuth);
+$('authBtn').addEventListener('click',doAuth);
+$('logoutBtn').addEventListener('click',logout);
+$('postBtn').addEventListener('click',createPost);
+$('passInput').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()});
+$('postInput').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter')createPost()});
+
+// ========== تشغيل ==========
+async function init(){
+  const saved=localStorage.getItem('chat_user');
+  if(saved){
+    try{
+      const{username,password}=JSON.parse(saved);
+      const{data}=await supabase.from('users').select('*').eq('username',username);
+      if(data&&data.length>0&&data[0].password===password){
+        me=data[0];
+        showMain();
+        return;
+      }
+    }catch{}
+    localStorage.removeItem('chat_user');
+  }
+}
+
+init();
 </script>
 </body>
   </html>
