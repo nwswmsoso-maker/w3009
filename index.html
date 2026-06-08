@@ -117,12 +117,19 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-grad
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(30,41,59,0.95);backdrop-filter:blur(20px);color:#fff;padding:14px 22px;border-radius:14px;font-size:14px;opacity:0;transition:.3s;z-index:400;border:1px solid rgba(99,102,241,0.3);box-shadow:0 10px 30px rgba(0,0,0,0.3);font-weight:600}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 
+.live-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;display:inline-block;animation:pulse 2s infinite;margin-left:6px;vertical-align:middle}
+
 @media(max-width:500px){.header{padding:10px 14px}.logo{font-size:20px}.feed{padding:0 8px;margin:16px auto}.post,.compose{padding:14px}.auth-box{padding:24px 18px}}
 </style>
 </head>
 <body>
+
 <div class="header">
-  <div class="logo"><div class="logo-icon">💬</div>دردشة لايف<span style="color:#818cf8">.</span><span class="city">بغداد</span></div>
+  <div class="logo">
+    <div class="logo-icon">💬</div>
+    دردشة لايف<span style="color:#818cf8">.</span><span class="city">بغداد</span>
+    <span class="live-dot" title="متصل"></span>
+  </div>
   <div class="user-area">
     <span id="headerUser" style="color:#fff;font-weight:700;font-size:14px"></span>
     <button id="logoutBtn" class="btn btn-ghost btn-sm hide">خروج</button>
@@ -191,6 +198,8 @@ let posts = [];
 let usersMap = {};
 let commentsMap = {};
 let likesMap = {};
+let isLoading = false;
+let lastPostCount = 0;
 
 function esc(t) {
   return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -314,7 +323,6 @@ function showMain() {
   $('headerUser').innerHTML = esc(me.display_name) + makeBadges(me, false);
   $('logoutBtn').classList.remove('hide');
 
-  // تحديث الأفاتار
   $('myAvatar').style.background = me.avatar_url ? 'none' : (me.avatar_color || '#6366f1');
   $('myAvatar').innerHTML = me.avatar_url
     ? '<img src="' + esc(me.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>'
@@ -335,6 +343,7 @@ function showMain() {
 
   loadFeed();
   startRealtime();
+  startAutoRefresh();
 }
 
 // ==================== IMAGE ====================
@@ -371,7 +380,10 @@ async function uploadImg(file) {
 }
 
 // ==================== FEED ====================
-async function loadFeed() {
+async function loadFeed(silent) {
+  if (isLoading) return;
+  isLoading = true;
+
   try {
     const [pR, uR, cR, lR] = await Promise.all([
       supabase.from('posts').select('*').eq('is_deleted', false).order('created_at', { ascending: false }).limit(50),
@@ -380,20 +392,16 @@ async function loadFeed() {
       supabase.from('likes').select('*')
     ]);
 
-    // بناء خريطة المستخدمين
     usersMap = {};
     if (uR.data) {
       uR.data.forEach(function (u) {
         usersMap[u.id] = u;
       });
     }
-
-    // إضافة المستخدم الحالي للخريطة
     if (me) {
       usersMap[me.id] = me;
     }
 
-    // بناء خريطة التعليقات
     commentsMap = {};
     if (cR.data) {
       cR.data.forEach(function (c) {
@@ -402,7 +410,6 @@ async function loadFeed() {
       });
     }
 
-    // بناء خريطة الإعجابات
     likesMap = {};
     if (lR.data) {
       lR.data.forEach(function (l) {
@@ -411,10 +418,23 @@ async function loadFeed() {
       });
     }
 
-    posts = pR.data || [];
+    const newPosts = pR.data || [];
+
+    // تنبيه عند وجود منشورات جديدة
+    if (!silent && lastPostCount > 0 && newPosts.length > lastPostCount) {
+      const diff = newPosts.length - lastPostCount;
+      if (diff > 0 && newPosts[0].user_id !== me.id) {
+        toast('📌 منشور جديد!');
+      }
+    }
+
+    posts = newPosts;
+    lastPostCount = posts.length;
     renderPosts();
   } catch (e) {
     console.error('Load error:', e);
+  } finally {
+    isLoading = false;
   }
 }
 
@@ -436,13 +456,11 @@ function renderPosts() {
     const liked = lks.some(function (l) { return l.user_id === me.id; });
     const canManage = (p.user_id === me.id) || me.is_admin;
 
-    // صورة المنشور
     let imgHtml = '';
     if (p.image_url) {
       imgHtml = '<img class="post-img" src="' + esc(p.image_url) + '" onclick="viewImg(\'' + esc(p.image_url) + '\')" loading="lazy"/>';
     }
 
-    // قائمة الخيارات
     let menuItems = '';
     if (canManage) {
       menuItems += '<button class="red" onclick="delPost(\'' + p.id + '\')">🗑 حذف المنشور</button>';
@@ -466,7 +484,6 @@ function renderPosts() {
       menuHtml = '<div class="post-menu"><button class="dots" onclick="toggleMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu-' + p.id + '">' + menuItems + '</div></div>';
     }
 
-    // التعليقات
     let cmtsHtml = '';
     for (let j = 0; j < cmts.length; j++) {
       const c = cmts[j];
@@ -498,7 +515,6 @@ function renderPosts() {
         '</div><div class="c-text">' + esc(c.content) + '</div></div></div>';
     }
 
-    // حقل إضافة تعليق
     let commentInput = '';
     if (!me.is_banned && !me.is_muted) {
       commentInput = '<div class="comment-input">' +
@@ -572,7 +588,7 @@ window.toggleLike = async function (pid) {
     } else {
       await supabase.from('likes').insert([{ post_id: pid, user_id: me.id }]);
     }
-    await loadFeed();
+    await loadFeed(true);
   } catch (e) { toast(e.message); }
 };
 
@@ -591,7 +607,7 @@ window.addComment = async function (pid, btn) {
     const { error } = await supabase.from('comments').insert([{ post_id: pid, user_id: me.id, content: txt }]);
     if (error) throw error;
     input.value = '';
-    await loadFeed();
+    await loadFeed(true);
     setTimeout(function () {
       const el = $('cmts-' + pid);
       if (el) el.classList.remove('hide');
@@ -614,7 +630,7 @@ window.delComment = async function (cid) {
   try {
     await supabase.from('comments').update({ is_deleted: true }).eq('id', cid);
     toast('تم حذف التعليق');
-    await loadFeed();
+    await loadFeed(true);
   } catch (e) { toast(e.message); }
 };
 
@@ -660,13 +676,22 @@ document.addEventListener('click', function (e) {
   }
 });
 
+// ==================== UPDATE INTERVAL ====================
+function startAutoRefresh() {
+  setInterval(function () {
+    if (me && !me.is_banned) {
+      loadFeed(true);
+    }
+  }, 3000);
+}
+
 // ==================== REALTIME ====================
 function startRealtime() {
   supabase.channel('feed-channel')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, function () { loadFeed(); })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, function () { loadFeed(); })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, function () { loadFeed(); })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, function () { loadFeed(); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, function () { loadFeed(true); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, function () { loadFeed(true); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, function () { loadFeed(true); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, function () { loadFeed(true); })
     .subscribe();
 }
 
