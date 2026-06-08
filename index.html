@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{overflow-x:hidden;-webkit-text-size-adjust:100%}
+html{overflow-x:hidden;-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
 body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;min-height:100vh;min-height:100dvh;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
 .header{background:#1f2937;border-bottom:1px solid #374151;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
@@ -47,8 +47,15 @@ body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;mi
 .auth-box .switch a{color:#818cf8;cursor:pointer;font-weight:700}
 .hide{display:none!important}
 
-.feed{max-width:600px;margin:16px auto;padding:0 12px 40px}
-.admin-bar{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);color:#c4b5fd;padding:10px 14px;border-radius:12px;margin-bottom:14px;font-size:13px;display:flex;align-items:center;gap:8px}
+.feed{max-width:600px;margin:16px auto;padding:0 12px;padding-bottom:40px}
+.admin-bar{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);color:#c4b5fd;padding:10px 14px;border-radius:12px;margin-bottom:14px;font-size:13px;display:flex;align-items:center;gap:8px;font-weight:700}
+
+.avatar-section{background:#1f2937;border:1px solid #374151;border-radius:16px;padding:14px;margin-bottom:16px}
+.avatar-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.avatar-row label{cursor:pointer;background:rgba(99,102,241,.15);color:#818cf8;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:700;border:1px solid rgba(99,102,241,.3)}
+.avatar-row input[type=file]{display:none}
+.avatar-row .hint{font-size:12px;color:#6b7280;flex-basis:100%;margin-top:4px}
+.av-big{width:60px;height:60px;font-size:24px}
 
 .compose{background:#1f2937;border:1px solid #374151;border-radius:16px;padding:14px;margin-bottom:16px}
 .compose-top{display:flex;gap:10px;align-items:flex-start}
@@ -59,14 +66,16 @@ body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;mi
 .post{background:#1f2937;border:1px solid #374151;border-radius:16px;padding:14px;margin-bottom:12px}
 .post-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px}
 .post-user{display:flex;gap:10px;align-items:center;flex:1}
-.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0;overflow:hidden;background:#6366f1}
+
+.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0;overflow:hidden}
 .avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .avatar-sm{width:28px;height:28px;font-size:11px}
-.avatar-lg{width:60px;height:60px}
+
 .name-wrap{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
 .post-name{font-weight:800;font-size:14px;color:#fff}
 .post-uname{font-size:12px;color:#6b7280}
-.post-content{font-size:15px;line-height:1.8;margin-bottom:10px;white-space:pre-wrap;word-break:break-word}
+.post-content{font-size:15px;line-height:1.8;margin-bottom:10px;white-space:pre-wrap;word-break:break-word;color:#e5e7eb}
+
 .post-actions{display:flex;gap:6px;align-items:center;padding-top:10px;border-top:1px solid #374151}
 .action-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#9ca3af;cursor:pointer;font-size:13px;font-family:inherit;display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-weight:600}
 .action-btn:active{background:rgba(255,255,255,.08)}
@@ -101,13 +110,7 @@ body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;mi
 .muted-msg{background:rgba(251,191,36,.08);color:#fbbf24;padding:12px;border-radius:12px;text-align:center;font-size:14px;margin-bottom:14px;border:1px solid rgba(251,191,36,.2)}
 .banned-msg{background:rgba(239,68,68,.08);color:#fca5a5;padding:16px;border-radius:12px;text-align:center;font-size:15px;border:1px solid rgba(239,68,68,.2)}
 
-.avatar-section{background:#1f2937;border:1px solid #374151;border-radius:16px;padding:14px;margin-bottom:16px}
-.avatar-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.avatar-row label{cursor:pointer;background:rgba(99,102,241,.15);color:#818cf8;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:700;border:1px solid rgba(99,102,241,.3)}
-.avatar-row input[type=file]{display:none}
-.avatar-row .hint{font-size:12px;color:#6b7280;flex-basis:100%;margin-top:4px}
-
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;border:1px solid #374151;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;z-index:400;font-weight:600;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;border:1px solid #374151;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;z-index:400;font-weight:600;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 </style>
 </head>
@@ -148,23 +151,26 @@ body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;mi
     <div id="mutedBox" class="muted-msg hide">🔇 تم كتمك مؤقتاً</div>
     <div id="adminBar" class="admin-bar hide">🟢 مرحباً صوفي - أنت مالك المنصة</div>
 
+    <!-- رفع الصورة خاص بك فقط -->
     <div id="avatarSection" class="avatar-section hide">
+      <div style="color:#9ca3af;font-size:13px;margin-bottom:10px;font-weight:700">تغيير صورتك الشخصية</div>
       <div class="avatar-row">
-        <div id="previewAvatar" class="avatar avatar-lg" style="background:#6366f1">?</div>
+        <div id="previewAvatar" class="avatar av-big" style="background:#6366f1">?</div>
         <div>
           <label for="avatarFile">📷 اختر صورة أو GIF</label>
-          <input type="file" id="avatarFile" accept="image/*"/>
+          <input type="file" id="avatarFile" accept="image/*,.gif"/>
           <div style="margin-top:6px">
             <button id="saveAvatarBtn" class="btn btn-primary btn-sm hide">حفظ الصورة</button>
           </div>
         </div>
       </div>
-      <div class="hint">اختر صورة ثابتة أو GIF متحرك كصورة بروفايل</div>
+      <div class="hint">هذه الميزة متاحة لمالك الموقع فقط</div>
     </div>
 
+    <!-- كتابة المنشور (بدون صور) -->
     <div id="composeBox" class="compose">
       <div class="compose-top">
-        <div id="myAvatar" class="avatar">?</div>
+        <div id="myAvatar" class="avatar" style="background:#6366f1">?</div>
         <textarea id="postInput" placeholder="شنو يدور بخاطرك؟"></textarea>
       </div>
       <div class="compose-bottom">
@@ -198,9 +204,7 @@ let likesMap = {};
 let isLoading = false;
 let lastPostCount = 0;
 
-function esc(t) {
-  return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+function esc(t) { return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
 function timeAgo(d) {
   if (!d) return '';
@@ -219,12 +223,10 @@ function toast(m) {
   toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2500);
 }
 
-function getInitial(n) {
-  return (n || '?')[0].toUpperCase();
-}
+function getInitial(n) { return (n || '?')[0].toUpperCase(); }
 
 function getUserById(id) {
-  if (id === me.id) return me;
+  if (me && id === me.id) return me;
   if (usersMap[id]) return usersMap[id];
   return { id: id, display_name: 'مستخدم', username: '?', avatar_color: '#4b5563', avatar_url: null, is_verified: false, is_admin: false, is_banned: false, is_muted: false };
 }
@@ -233,7 +235,7 @@ function buildBadges(u, showStatus) {
   let h = '';
   if (u.is_verified) h += '<span class="vbadge">✓</span>';
   if (u.is_admin) h += '<span class="owner-tag">مالك</span>';
-  if (showStatus && me.is_admin && !u.is_admin) {
+  if (showStatus && me && me.is_admin && !u.is_admin) {
     if (u.is_banned) h += '<span class="status-tag banned">محظور</span>';
     else if (u.is_muted) h += '<span class="status-tag muted">مكتوم</span>';
   }
@@ -245,8 +247,7 @@ function buildAvatar(u, extraClass) {
   if (u.avatar_url) {
     return '<div class="' + cls + '"><img src="' + esc(u.avatar_url) + '" alt="" loading="lazy"/></div>';
   }
-  const bg = u.avatar_color || '#6366f1';
-  return '<div class="' + cls + '" style="background:' + esc(bg) + '">' + getInitial(u.display_name) + '</div>';
+  return '<div class="' + cls + '" style="background:' + esc(u.avatar_color || '#6366f1') + '">' + getInitial(u.display_name) + '</div>';
 }
 
 function updateMyAvatarElements() {
@@ -309,10 +310,7 @@ async function handleAuth() {
       const colors = ['#6366f1','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4','#f97316'];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
       const { data, error } = await supabase.from('users').insert([{
-        username: username,
-        display_name: displayName,
-        password: password,
-        avatar_color: randomColor
+        username: username, display_name: displayName, password: password, avatar_color: randomColor
       }]).select().single();
       if (error) throw error;
       me = data;
@@ -346,6 +344,8 @@ function startApp() {
     $('adminBar').classList.remove('hide');
     $('avatarSection').classList.remove('hide');
     updateMyAvatarElements();
+  } else {
+    updateMyAvatarElements();
   }
 
   loadFeed();
@@ -353,7 +353,7 @@ function startApp() {
   setInterval(() => { if (me && !me.is_banned) loadFeed(true); }, 3000);
 }
 
-// ===== AVATAR UPLOAD =====
+// ===== AVATAR UPLOAD (ADMIN ONLY) FIX =====
 $('avatarFile').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -381,45 +381,25 @@ $('saveAvatarBtn').addEventListener('click', async function() {
   btn.textContent = 'جاري الرفع...';
 
   try {
-    const originalName = selectedAvatarFile.name || 'avatar.jpg';
-    const ext = originalName.split('.').pop().toLowerCase();
-    const safeName = 'avatar_' + me.username + '_' + Date.now() + '.' + ext;
-    const contentType = selectedAvatarFile.type || ('image/' + (ext === 'gif' ? 'gif' : 'jpeg'));
-
-    console.log('رفع الملف:', safeName, 'النوع:', contentType, 'الحجم:', selectedAvatarFile.size);
+    const ext = selectedAvatarFile.name.split('.').pop().toLowerCase();
+    // إنشاء اسم فريد في كل مرة و upsert: false لحل مشكلة الـ RLS
+    const safeName = 'avatar_' + Date.now() + '_' + Math.floor(Math.random()*1000) + '.' + ext;
+    const contentType = selectedAvatarFile.type || 'image/gif';
 
     const { data: uploaded, error: uploadError } = await supabase.storage
       .from('images')
       .upload(safeName, selectedAvatarFile, {
         contentType: contentType,
-        upsert: true
+        upsert: false 
       });
 
-    if (uploadError) {
-      console.error('Upload failed:', uploadError);
-      throw new Error('فشل الرفع: ' + uploadError.message);
-    }
+    if (uploadError) throw new Error('تأكد من فتح صلاحيات الـ SQL للصور');
 
-    console.log('تم الرفع بنجاح:', uploaded);
-
-    const { data: urlData } = supabase.storage
-      .from('images')
-      .getPublicUrl(safeName);
-
+    const { data: urlData } = supabase.storage.from('images').getPublicUrl(safeName);
     const publicUrl = urlData.publicUrl;
-    console.log('الرابط العام:', publicUrl);
 
-    if (!publicUrl) throw new Error('فشل جلب رابط الصورة');
-
-    const { error: dbError } = await supabase
-      .from('users')
-      .update({ avatar_url: publicUrl })
-      .eq('id', me.id);
-
-    if (dbError) {
-      console.error('DB update failed:', dbError);
-      throw new Error('فشل تحديث قاعدة البيانات: ' + dbError.message);
-    }
+    const { error: dbError } = await supabase.from('users').update({ avatar_url: publicUrl }).eq('id', me.id);
+    if (dbError) throw new Error('فشل التحديث');
 
     me.avatar_url = publicUrl;
     updateMyAvatarElements();
@@ -429,7 +409,6 @@ $('saveAvatarBtn').addEventListener('click', async function() {
     await loadFeed();
 
   } catch (e) {
-    console.error('Avatar error:', e);
     toast(e.message || 'فشل');
   } finally {
     btn.disabled = false;
@@ -451,9 +430,7 @@ async function loadFeed(silent) {
     ]);
 
     usersMap = {};
-    if (usersRes.data) {
-      usersRes.data.forEach(u => { usersMap[u.id] = u; });
-    }
+    if (usersRes.data) usersRes.data.forEach(u => { usersMap[u.id] = u; });
 
     commentsMap = {};
     if (commentsRes.data) {
@@ -474,9 +451,7 @@ async function loadFeed(silent) {
     const newPosts = postsRes.data || [];
 
     if (!silent && lastPostCount > 0 && newPosts.length > lastPostCount) {
-      if (newPosts[0].user_id !== me.id) {
-        toast('📌 منشور جديد');
-      }
+      if (newPosts[0].user_id !== me.id) toast('📌 منشور جديد');
     }
 
     posts = newPosts;
@@ -506,9 +481,8 @@ function renderAllPosts() {
     const postComments = commentsMap[post.id] || [];
     const postLikes = likesMap[post.id] || [];
     const isLiked = postLikes.some(l => l.user_id === me.id);
-    const canManage = (post.user_id === me.id) || me.is_admin;
+    const canManage = (post.user_id === me.id) || (me && me.is_admin);
 
-    // القائمة
     let menuItems = '';
     if (canManage) {
       menuItems += '<button class="red" onclick="window._delPost(\'' + post.id + '\')">🗑 حذف</button>';
@@ -527,7 +501,6 @@ function renderAllPosts() {
       ? '<div class="post-menu"><button class="dots" onclick="window._toggleMenu(\'' + post.id + '\')">⋮</button><div class="dropdown" id="menu-' + post.id + '">' + menuItems + '</div></div>'
       : '';
 
-    // التعليقات
     let commentsHtml = '';
     for (let j = 0; j < postComments.length; j++) {
       const c = postComments[j];
@@ -586,7 +559,7 @@ function renderAllPosts() {
 async function createPost() {
   if (me.is_banned || me.is_muted) return;
   const txt = $('postInput').value.trim();
-  if (!txt) { toast('اكتب شي'); return; }
+  if (!txt) { toast('اكتب شي بالمنشور'); return; }
 
   $('postBtn').disabled = true;
 
@@ -607,11 +580,8 @@ window._toggleLike = async function(pid) {
   if (me.is_banned) return;
   const existing = (likesMap[pid] || []).find(l => l.user_id === me.id);
   try {
-    if (existing) {
-      await supabase.from('likes').delete().eq('id', existing.id);
-    } else {
-      await supabase.from('likes').insert([{ post_id: pid, user_id: me.id }]);
-    }
+    if (existing) await supabase.from('likes').delete().eq('id', existing.id);
+    else await supabase.from('likes').insert([{ post_id: pid, user_id: me.id }]);
     await loadFeed(true);
   } catch (e) { toast(e.message); }
 };
@@ -716,9 +686,7 @@ $('postInput').addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'En
         startApp();
         return;
       }
-    } catch (e) {
-      console.error('Init error:', e);
-    }
+    } catch (e) {}
     localStorage.removeItem('chat_session');
   }
 })();
