@@ -151,7 +151,6 @@ body{font-family:'Tajawal',Tahoma,sans-serif;background:#111827;color:#e5e7eb;mi
     <div id="mutedBox" class="muted-msg hide">🔇 تم كتمك مؤقتاً</div>
     <div id="adminBar" class="admin-bar hide">🟢 مرحباً صوفي - أنت مالك المنصة</div>
 
-    <!-- قسم الأفاتار متاح للمالك فقط -->
     <div id="avatarSection" class="avatar-section hide">
       <div style="color:#9ca3af;font-size:13px;margin-bottom:10px;font-weight:700">تغيير صورتك الشخصية</div>
       <div class="avatar-row">
@@ -347,14 +346,15 @@ function startApp() {
   updateMyAvatarElements();
   loadFeed();
   startRealtime();
-  setInterval(() => { if (me && !me.is_banned) loadFeed(true); }, 3000);
+  // تم مسح كود الـ setInterval هنا حتى نعتمد على الـ Realtime ونريح السيرفر
 }
 
-// ===== AVATAR UPLOAD (BASE64 - تخطي Storage) =====
+// ===== AVATAR UPLOAD (BASE64) =====
 $('avatarFile').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
-  if (file.size > 4 * 1024 * 1024) { toast('الحد الأقصى 4MB'); return; }
+  // تم رفع الحد الأقصى إلى 10 ميجابايت بدلاً من 4
+  if (file.size > 10 * 1024 * 1024) { toast('الحد الأقصى 10MB'); return; }
 
   selectedAvatarFile = file;
 
